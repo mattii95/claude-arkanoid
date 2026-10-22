@@ -158,8 +158,7 @@ function draw() {
   ctx.textBaseline = "top";
   ctx.textAlign = "left";
   ctx.fillText("Puntos: " + game.score, 10, 10);
-  ctx.textAlign = "right";
-  ctx.fillText("Vidas: " + game.lives, W - 10, 10);
+  for (let i = 0; i < game.lives; i++) drawSprite(ctx, "ball", W - 26 - i * 20, 10, 16, 16);
 
   const msg = {
     start: ["ARKANOID", "Espacio o click para empezar"],
