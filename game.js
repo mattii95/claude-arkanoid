@@ -7,7 +7,9 @@ const ctx = canvas.getContext("2d");
 const paddle = { x: 0, y: 440, w: 162, h: 14, speed: 8 }; // x = borde izquierdo
 const ball = { x: 0, y: 0, w: 16, h: 16, vx: 0, vy: 0, speed: 5 }; // x,y = esquina superior izquierda
 
-const COLORS = ["gray", "red", "yellow", "cyan", "magenta", "hotpink", "green"];
+const game = { score: 0, lives: 3 };
+
+const COLORS =["gray", "red", "yellow", "cyan", "magenta", "hotpink", "green"];
 
 // 7 filas × 20 columnas, una fila por color
 const bricks = [];
@@ -100,6 +102,7 @@ function update() {
     const oy = Math.min(ball.y + ball.h, b.y + b.h) - Math.max(ball.y, b.y);
     if (ox <= 0 || oy <= 0) continue;
     b.alive = false;
+    game.score += 10;
     // Se invierte el eje de menor solape y se saca la pelota del bloque
     if (ox < oy) {
       ball.x += ball.x + ball.w / 2 < b.x + b.w / 2 ? -ox : ox;
@@ -110,8 +113,10 @@ function update() {
     }
     break; // un bloque por frame
   }
-  // Provisional: el paso 6 sustituye esto por la pérdida de vida
-  if (ball.y > H) launched = false;
+  if (ball.y > H) {
+    game.lives = Math.max(0, game.lives - 1); // el Game Over llega en el paso 7
+    launched = false;
+  }
 }
 
 function draw() {
@@ -121,6 +126,14 @@ function draw() {
   }
   drawSprite(ctx, "paddle", paddle.x, paddle.y, paddle.w, paddle.h);
   drawSprite(ctx, "ball", ball.x, ball.y, ball.w, ball.h);
+
+  ctx.fillStyle = "#fff";
+  ctx.font = "20px monospace";
+  ctx.textBaseline = "top";
+  ctx.textAlign = "left";
+  ctx.fillText("Puntos: " + game.score, 10, 10);
+  ctx.textAlign = "right";
+  ctx.fillText("Vidas: " + game.lives, W - 10, 10);
 }
 
 function loop() {
