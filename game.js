@@ -68,6 +68,22 @@ function update() {
     ball.y = 0;
     ball.vy = -ball.vy;
   }
+  if (
+    ball.vy > 0 &&
+    ball.x + ball.w > paddle.x &&
+    ball.x < paddle.x + paddle.w &&
+    ball.y + ball.h > paddle.y &&
+    ball.y < paddle.y + paddle.h
+  ) {
+    const offset = Math.max(
+      -1,
+      Math.min(1, (ball.x + ball.w / 2 - (paddle.x + paddle.w / 2)) / (paddle.w / 2)),
+    );
+    const a = (offset * 60 * Math.PI) / 180; // ±60° respecto a la vertical
+    ball.vx = ball.speed * Math.sin(a);
+    ball.vy = -ball.speed * Math.cos(a);
+    ball.y = paddle.y - ball.h;
+  }
   // Provisional: el paso 6 sustituye esto por la pérdida de vida
   if (ball.y > H) launched = false;
 }
