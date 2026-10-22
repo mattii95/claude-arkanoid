@@ -7,6 +7,16 @@ const ctx = canvas.getContext("2d");
 const paddle = { x: 0, y: 440, w: 162, h: 14, speed: 8 }; // x = borde izquierdo
 const ball = { x: 0, y: 0, w: 16, h: 16, vx: 0, vy: 0, speed: 5 }; // x,y = esquina superior izquierda
 
+const COLORS = ["gray", "red", "yellow", "cyan", "magenta", "hotpink", "green"];
+
+// 7 filas × 20 columnas, una fila por color
+const bricks = [];
+for (let r = 0; r < 7; r++) {
+  for (let c = 0; c < 20; c++) {
+    bricks.push({ x: c * 32, y: 60 + r * 16, w: 32, h: 16, color: COLORS[r], alive: true });
+  }
+}
+
 const keys = {};
 addEventListener("keydown", (e) => (keys[e.code] = true));
 addEventListener("keyup", (e) => (keys[e.code] = false));
@@ -84,12 +94,31 @@ function update() {
     ball.vy = -ball.speed * Math.cos(a);
     ball.y = paddle.y - ball.h;
   }
+  for (const b of bricks) {
+    if (!b.alive) continue;
+    const ox = Math.min(ball.x + ball.w, b.x + b.w) - Math.max(ball.x, b.x);
+    const oy = Math.min(ball.y + ball.h, b.y + b.h) - Math.max(ball.y, b.y);
+    if (ox <= 0 || oy <= 0) continue;
+    b.alive = false;
+    // Se invierte el eje de menor solape y se saca la pelota del bloque
+    if (ox < oy) {
+      ball.x += ball.x + ball.w / 2 < b.x + b.w / 2 ? -ox : ox;
+      ball.vx = -ball.vx;
+    } else {
+      ball.y += ball.y + ball.h / 2 < b.y + b.h / 2 ? -oy : oy;
+      ball.vy = -ball.vy;
+    }
+    break; // un bloque por frame
+  }
   // Provisional: el paso 6 sustituye esto por la pérdida de vida
   if (ball.y > H) launched = false;
 }
 
 function draw() {
   ctx.clearRect(0, 0, W, H);
+  for (const b of bricks) {
+    if (b.alive) drawSprite(ctx, "block_" + b.color, b.x, b.y, b.w, b.h);
+  }
   drawSprite(ctx, "paddle", paddle.x, paddle.y, paddle.w, paddle.h);
   drawSprite(ctx, "ball", ball.x, ball.y, ball.w, ball.h);
 }
