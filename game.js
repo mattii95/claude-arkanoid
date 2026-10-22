@@ -7,7 +7,7 @@ const ctx = canvas.getContext("2d");
 const paddle = { x: 0, y: 440, w: 162, h: 14, speed: 8 }; // x = borde izquierdo
 const ball = { x: 0, y: 0, w: 16, h: 16, vx: 0, vy: 0, speed: 5 }; // x,y = esquina superior izquierda
 
-const game = { score: 0, lives: 3 };
+const game = { state: "start", score: 0, lives: 3 }; // state: 'start' | 'playing' | 'paused' | 'won' | 'lost'
 
 const COLORS =["gray", "red", "yellow", "cyan", "magenta", "hotpink", "green"];
 
@@ -24,6 +24,7 @@ addEventListener("keydown", (e) => (keys[e.code] = true));
 addEventListener("keyup", (e) => (keys[e.code] = false));
 
 canvas.addEventListener("mousemove", (e) => {
+  if (game.state !== "playing") return;
   const r = canvas.getBoundingClientRect();
   paddle.x = ((e.clientX - r.left) * W) / r.width - paddle.w / 2;
   clampPaddle();
@@ -49,15 +50,39 @@ function launch() {
   ball.vy = -ball.speed * Math.cos(a);
 }
 
+function reset() {
+  game.score = 0;
+  game.lives = 3;
+  bricks.forEach((b) => (b.alive = true));
+  paddle.x = (W - paddle.w) / 2;
+  launched = false;
+  stickBall();
+}
+
+// Espacio o click: empieza, lanza o reinicia según el estado
+function action() {
+  if (game.state === "start") game.state = "playing";
+  else if (game.state === "playing") launch();
+  else if (game.state === "won" || game.state === "lost") {
+    reset();
+    game.state = "playing";
+  }
+}
+
 addEventListener("keydown", (e) => {
+  if (e.repeat) return;
   if (e.code === "Space") {
     e.preventDefault();
-    launch();
+    action();
+  } else if (e.code === "KeyP") {
+    if (game.state === "playing") game.state = "paused";
+    else if (game.state === "paused") game.state = "playing";
   }
 });
-canvas.addEventListener("mousedown", launch);
+canvas.addEventListener("mousedown", action);
 
 function update() {
+  if (game.state !== "playing") return;
   if (keys.ArrowLeft || keys.KeyA) paddle.x -= paddle.speed;
   if (keys.ArrowRight || keys.KeyD) paddle.x += paddle.speed;
   clampPaddle();
@@ -111,11 +136,12 @@ function update() {
       ball.y += ball.y + ball.h / 2 < b.y + b.h / 2 ? -oy : oy;
       ball.vy = -ball.vy;
     }
+    if (bricks.every((k) => !k.alive)) game.state = "won";
     break; // un bloque por frame
   }
   if (ball.y > H) {
-    game.lives = Math.max(0, game.lives - 1); // el Game Over llega en el paso 7
     launched = false;
+    if (--game.lives === 0) game.state = "lost";
   }
 }
 
@@ -134,6 +160,24 @@ function draw() {
   ctx.fillText("Puntos: " + game.score, 10, 10);
   ctx.textAlign = "right";
   ctx.fillText("Vidas: " + game.lives, W - 10, 10);
+
+  const msg = {
+    start: ["ARKANOID", "Espacio o click para empezar"],
+    paused: ["PAUSA", "P para continuar"],
+    won: ["¡VICTORIA!", "Espacio para reiniciar"],
+    lost: ["GAME OVER", "Espacio para reiniciar"],
+  }[game.state];
+  if (msg) {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = "40px monospace";
+    ctx.fillText(msg[0], W / 2, H / 2 - 20);
+    ctx.font = "20px monospace";
+    ctx.fillText(msg[1], W / 2, H / 2 + 25);
+  }
 }
 
 function loop() {
@@ -142,5 +186,5 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
-paddle.x = (W - paddle.w) / 2;
+reset();
 loadSpritesheet(loop);
