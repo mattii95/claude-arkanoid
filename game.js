@@ -27,11 +27,49 @@ function stickBall() {
   ball.y = paddle.y - ball.h;
 }
 
+let launched = false;
+
+function launch() {
+  if (launched) return;
+  launched = true;
+  const a = (20 * Math.PI) / 180; // ángulo inicial respecto a la vertical
+  ball.vx = ball.speed * Math.sin(a);
+  ball.vy = -ball.speed * Math.cos(a);
+}
+
+addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    launch();
+  }
+});
+canvas.addEventListener("mousedown", launch);
+
 function update() {
   if (keys.ArrowLeft || keys.KeyA) paddle.x -= paddle.speed;
   if (keys.ArrowRight || keys.KeyD) paddle.x += paddle.speed;
   clampPaddle();
-  stickBall();
+
+  if (!launched) {
+    stickBall();
+    return;
+  }
+
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+  if (ball.x < 0) {
+    ball.x = 0;
+    ball.vx = -ball.vx;
+  } else if (ball.x + ball.w > W) {
+    ball.x = W - ball.w;
+    ball.vx = -ball.vx;
+  }
+  if (ball.y < 0) {
+    ball.y = 0;
+    ball.vy = -ball.vy;
+  }
+  // Provisional: el paso 6 sustituye esto por la pérdida de vida
+  if (ball.y > H) launched = false;
 }
 
 function draw() {
