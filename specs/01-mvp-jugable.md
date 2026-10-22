@@ -1,6 +1,6 @@
 # SPEC 01 — MVP jugable de Arkanoid
 
-> **Estado:** Borrador
+> **Estado:** Aprobado
 > **Depende de:** ninguna (usa los assets existentes en `assets/`)
 > **Fecha:** 2026-10-22
 > **Objetivo:** Un Arkanoid de un solo nivel, jugable de principio a fin en el navegador, con paleta, pelota, bloques, vidas y puntuación.
@@ -38,20 +38,23 @@
 Estructuras nuevas en `game.js`. No se modifica `assets/spritesheet.js`.
 
 ```js
-const W = 640, H = 480;
-const COLORS = ['gray', 'red', 'yellow', 'cyan', 'magenta', 'hotpink', 'green'];
+const W = 640,
+  H = 480;
+const COLORS = ["gray", "red", "yellow", "cyan", "magenta", "hotpink", "green"];
 
 const game = {
-  state: 'start',   // 'start' | 'playing' | 'paused' | 'won' | 'lost'
+  state: "start", // 'start' | 'playing' | 'paused' | 'won' | 'lost'
   score: 0,
   lives: 3,
 };
 
-const paddle = { x: 0, y: 440, w: 162, h: 14, speed: 8 };   // x = borde izquierdo
-const ball = { x: 0, y: 0, w: 16, h: 16, vx: 0, vy: 0, speed: 5 };  // x,y = esquina superior izquierda
+const paddle = { x: 0, y: 440, w: 162, h: 14, speed: 8 }; // x = borde izquierdo
+const ball = { x: 0, y: 0, w: 16, h: 16, vx: 0, vy: 0, speed: 5 }; // x,y = esquina superior izquierda
 
 // Una entrada por bloque
-const bricks = [/* { x, y, w: 32, h: 16, color, alive } */];
+const bricks = [
+  /* { x, y, w: 32, h: 16, color, alive } */
+];
 ```
 
 Convenciones:
@@ -119,11 +122,11 @@ Cada paso deja la página ejecutable y se puede commitear solo.
 
 ## Riesgos
 
-| Riesgo                                                                 | Mitigación                                                                                                      |
-| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Tunneling: la pelota atraviesa la paleta o un bloque a velocidad alta   | Velocidad de 5 px/frame con sprites de ≥14 px de alto; no se acelera en este MVP.                                |
-| Velocidad dependiente de la tasa de refresco del monitor               | Se acepta px/frame en el MVP; el delta time se deja para una spec futura.                                        |
-| Pelota con ángulo casi horizontal que tarda mucho en bajar             | Limitar el ángulo máximo a ±60° respecto a la vertical.                                                         |
+| Riesgo                                                                | Mitigación                                                                        |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Tunneling: la pelota atraviesa la paleta o un bloque a velocidad alta | Velocidad de 5 px/frame con sprites de ≥14 px de alto; no se acelera en este MVP. |
+| Velocidad dependiente de la tasa de refresco del monitor              | Se acepta px/frame en el MVP; el delta time se deja para una spec futura.         |
+| Pelota con ángulo casi horizontal que tarda mucho en bajar            | Limitar el ángulo máximo a ±60° respecto a la vertical.                           |
 
 ---
 
