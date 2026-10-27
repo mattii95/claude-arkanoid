@@ -122,13 +122,16 @@ function update() {
   if (ball.x < 0) {
     ball.x = 0;
     ball.vx = -ball.vx;
+    playSound("bounce");
   } else if (ball.x + ball.w > W) {
     ball.x = W - ball.w;
     ball.vx = -ball.vx;
+    playSound("bounce");
   }
   if (ball.y < 0) {
     ball.y = 0;
     ball.vy = -ball.vy;
+    playSound("bounce");
   }
   if (
     ball.vy > 0 &&
@@ -145,6 +148,7 @@ function update() {
     ball.vx = ball.speed * Math.sin(a);
     ball.vy = -ball.speed * Math.cos(a);
     ball.y = paddle.y - ball.h;
+    playSound("bounce");
   }
   for (const b of bricks) {
     if (!b.alive) continue;
