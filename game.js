@@ -157,6 +157,7 @@ function update() {
     if (ox <= 0 || oy <= 0) continue;
     b.alive = false;
     explosions.push({ x: b.x, y: b.y, color: b.color, age: 0 });
+    playSound("break");
     game.score += 10;
     // Se invierte el eje de menor solape y se saca la pelota del bloque
     if (ox < oy) {
