@@ -24,6 +24,20 @@ const explosions = []; // { x, y, color, age } — age = frames de juego transcu
 // 150 ms a 60 fps ≈ 9 frames
 const EXPLOSION_TICKS = Math.round(EXPLOSION_DURATION / (1000 / 60));
 
+const sounds = {
+  bounce: new Audio("assets/sounds/ball-bounce.mp3"),
+  break: new Audio("assets/sounds/break-sound.mp3"),
+};
+
+let muted = false; // se pierde al recargar la página
+
+function playSound(name) {
+  if (muted) return;
+  const s = sounds[name];
+  s.currentTime = 0;
+  s.play().catch(() => {});
+}
+
 const keys = {};
 addEventListener("keydown", (e) => (keys[e.code] = true));
 addEventListener("keyup", (e) => (keys[e.code] = false));
