@@ -1,6 +1,6 @@
 # SPEC 02 — Animación de destrucción de bloques
 
-> **Estado:** Borrador
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-10-27
 > **Objetivo:** Mostrar una animación de explosión de 4 frames en el lugar de cada bloque que se rompe, sin cambiar la lógica de colisión ni de puntuación.
@@ -34,7 +34,8 @@ Estructura nueva en `game.js`. No se modifica `assets/spritesheet.js`.
 ```js
 // Explosiones en curso; una entrada por bloque roto
 const explosions = [
-  /* { x, y, color, age } */ // age = frames de juego transcurridos
+  /* { x, y, color, age } */
+  // age = frames de juego transcurridos
 ];
 
 // 150 ms a 60 fps ≈ 9 frames
@@ -62,18 +63,18 @@ Cada paso deja la página ejecutable y se puede commitear solo.
 
 ## Criterios de aceptación
 
-- [ ] Servido por HTTP, la página carga sin errores en la consola.
-- [ ] Al romper un bloque, aparece una explosión en su posición con el color de su fila.
-- [ ] La explosión muestra los 4 frames de `EXPLOSION_FRAMES[color]` en orden y desaparece al terminar.
-- [ ] La explosión dura aproximadamente 150 ms (9 frames a 60 fps).
-- [ ] El bloque roto sigue desapareciendo, sumando 10 puntos y rebotando la pelota en el mismo frame que antes.
-- [ ] Al romper varios bloques seguidos, sus explosiones se ven a la vez sin cortarse entre sí.
-- [ ] Al pausar con `P` con una explosión en curso, se queda congelada; al reanudar continúa.
-- [ ] Al romper el último bloque, se muestra la pantalla de victoria y su explosión termina de animarse.
-- [ ] Al reiniciar con Espacio no queda ninguna explosión en pantalla y `explosions.length === 0`.
-- [ ] El bloque gray explota con los frames del rojo.
-- [ ] El juego no reproduce ningún sonido.
-- [ ] El repositorio no tiene dependencias ni paso de build.
+- [x] Servido por HTTP, la página carga sin errores en la consola.
+- [x] Al romper un bloque, aparece una explosión en su posición con el color de su fila.
+- [x] La explosión muestra los 4 frames de `EXPLOSION_FRAMES[color]` en orden y desaparece al terminar.
+- [x] La explosión dura aproximadamente 150 ms (9 frames a 60 fps).
+- [x] El bloque roto sigue desapareciendo, sumando 10 puntos y rebotando la pelota en el mismo frame que antes.
+- [x] Al romper varios bloques seguidos, sus explosiones se ven a la vez sin cortarse entre sí.
+- [x] Al pausar con `P` con una explosión en curso, se queda congelada; al reanudar continúa.
+- [x] Al romper el último bloque, se muestra la pantalla de victoria y su explosión termina de animarse.
+- [x] Al reiniciar con Espacio no queda ninguna explosión en pantalla y `explosions.length === 0`.
+- [x] El bloque gray explota con los frames del rojo.
+- [x] El juego no reproduce ningún sonido.
+- [x] El repositorio no tiene dependencias ni paso de build.
 
 ---
 
@@ -94,11 +95,11 @@ Cada paso deja la página ejecutable y se puede commitear solo.
 
 ## Riesgos
 
-| Riesgo                                                                  | Mitigación                                                                                           |
-| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| En monitores de 120/144 Hz la animación dura menos de 150 ms            | Se acepta como en el SPEC 01 (px/frame); el delta time va en una spec futura.                        |
-| `update()` hoy sale pronto si `state !== "playing"`, y congelaría `won` | Avanzar las explosiones antes de ese `return`, con su propia condición de estado (paso 3).           |
-| `EXPLOSION_FRAMES.gray` reutiliza los frames del rojo                   | Comportamiento conocido y aceptado; el gray explota con aspecto rojo.                                |
+| Riesgo                                                                  | Mitigación                                                                                 |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| En monitores de 120/144 Hz la animación dura menos de 150 ms            | Se acepta como en el SPEC 01 (px/frame); el delta time va en una spec futura.              |
+| `update()` hoy sale pronto si `state !== "playing"`, y congelaría `won` | Avanzar las explosiones antes de ese `return`, con su propia condición de estado (paso 3). |
+| `EXPLOSION_FRAMES.gray` reutiliza los frames del rojo                   | Comportamiento conocido y aceptado; el gray explota con aspecto rojo.                      |
 
 ---
 

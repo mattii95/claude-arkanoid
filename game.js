@@ -19,6 +19,11 @@ for (let r = 0; r < 7; r++) {
   }
 }
 
+// Explosiones en curso; una entrada por bloque roto
+const explosions = []; // { x, y, color, age } — age = frames de juego transcurridos
+// 150 ms a 60 fps ≈ 9 frames
+const EXPLOSION_TICKS = Math.round(EXPLOSION_DURATION / (1000 / 60));
+
 const keys = {};
 addEventListener("keydown", (e) => (keys[e.code] = true));
 addEventListener("keyup", (e) => (keys[e.code] = false));
@@ -54,6 +59,7 @@ function reset() {
   game.score = 0;
   game.lives = 3;
   bricks.forEach((b) => (b.alive = true));
+  explosions.length = 0;
   paddle.x = (W - paddle.w) / 2;
   launched = false;
   stickBall();
@@ -82,6 +88,11 @@ addEventListener("keydown", (e) => {
 canvas.addEventListener("mousedown", action);
 
 function update() {
+  if (game.state !== "start" && game.state !== "paused") {
+    for (let i = explosions.length - 1; i >= 0; i--) {
+      if (++explosions[i].age >= EXPLOSION_TICKS) explosions.splice(i, 1);
+    }
+  }
   if (game.state !== "playing") return;
   if (keys.ArrowLeft || keys.KeyA) paddle.x -= paddle.speed;
   if (keys.ArrowRight || keys.KeyD) paddle.x += paddle.speed;
@@ -127,6 +138,7 @@ function update() {
     const oy = Math.min(ball.y + ball.h, b.y + b.h) - Math.max(ball.y, b.y);
     if (ox <= 0 || oy <= 0) continue;
     b.alive = false;
+    explosions.push({ x: b.x, y: b.y, color: b.color, age: 0 });
     game.score += 10;
     // Se invierte el eje de menor solape y se saca la pelota del bloque
     if (ox < oy) {
@@ -149,6 +161,10 @@ function draw() {
   ctx.clearRect(0, 0, W, H);
   for (const b of bricks) {
     if (b.alive) drawSprite(ctx, "block_" + b.color, b.x, b.y, b.w, b.h);
+  }
+  for (const e of explosions) {
+    const frame = Math.floor((e.age / EXPLOSION_TICKS) * 4);
+    drawFrame(ctx, EXPLOSION_FRAMES[e.color][frame], e.x, e.y, 32, 16);
   }
   drawSprite(ctx, "paddle", paddle.x, paddle.y, paddle.w, paddle.h);
   drawSprite(ctx, "ball", ball.x, ball.y, ball.w, ball.h);
