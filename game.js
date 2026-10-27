@@ -97,6 +97,8 @@ addEventListener("keydown", (e) => {
   } else if (e.code === "KeyP") {
     if (game.state === "playing") game.state = "paused";
     else if (game.state === "paused") game.state = "playing";
+  } else if (e.code === "KeyM") {
+    muted = !muted;
   }
 });
 canvas.addEventListener("mousedown", action);
